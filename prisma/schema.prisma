@@ -1,0 +1,86 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url     =  env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum TaskStatus {
+  TODO       
+  IN_PROGRESS 
+  DONE        
+}
+
+model Workspace{
+  id          String  @id @default(uuid())
+  title       String
+  boards      Board[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Board {
+  id          String    @id @default(uuid())
+  title       String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id],onDelete: Cascade)
+  workspaceId String
+  lists       List[]    
+  tasks       Task[]   
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  members     BoardMember[]
+}
+
+model List {
+  id          String   @id @default(uuid())
+  title       String
+  board       Board    @relation(fields: [boardId], references: [id],onDelete: Cascade)
+  boardId     String
+  tasks       Task[]   
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Task {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  dueDate     DateTime?
+  list        List     @relation(fields: [listId], references: [id],onDelete: Cascade)
+  listId      String
+  status      TaskStatus @default(TODO)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  board       Board     @relation(fields: [boardId], references: [id],onDelete: Cascade) 
+  boardId     String  
+}
+
+model User {
+  id          String   @id @default(uuid())
+  email       String   @unique
+  password    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  boardMembers BoardMember[]
+}
+
+model BoardMember {
+  id        String  @id @default(uuid())
+  boardId   String
+  userEmail String  
+  board     Board   @relation(fields: [boardId], references: [id])
+  createdAt DateTime @default(now())
+  user      User    @relation(fields: [userEmail], references: [email])
+  isStarred Boolean @default(false)
+}
+
+
