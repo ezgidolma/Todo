@@ -10,6 +10,7 @@ export class TaskController {
   constructor(private readonly taskService: TaskService) { }
 
   @Post()
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new task' })
   @ApiResponse({ status: 201, description: 'The task has been successfully created.' }) 
    /*@ApiHeader({
@@ -23,6 +24,7 @@ export class TaskController {
   }
 
   @Patch(':id')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update an existing task' })
   @ApiParam({ name: 'id', description: 'The ID of the task to be updated' })
   @ApiResponse({ status: 200, description: 'The task has been successfully updated.' })
@@ -44,11 +46,6 @@ export class TaskController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get all tasks' })
   @ApiResponse({ status: 200, description: 'List of tasks' })
-  @ApiHeader({
-    name: 'Authorization', 
-    description: 'Auth token', 
-    required: true,
-  })
   @UseGuards(JwtAuthGuard)
   async findAll() {
     return await this.taskService.getTasks();
