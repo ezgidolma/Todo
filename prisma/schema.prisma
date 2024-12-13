@@ -51,36 +51,47 @@ model List {
 }
 
 model Task {
-  id          String   @id @default(uuid())
-  title       String
-  description String?
-  dueDate     DateTime?
-  list        List     @relation(fields: [listId], references: [id],onDelete: Cascade)
-  listId      String
-  status      TaskStatus @default(TODO)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  board       Board     @relation(fields: [boardId], references: [id],onDelete: Cascade) 
-  boardId     String  
+  id            String   @id @default(uuid())
+  title         String
+  description   String?
+  dueDate       DateTime?
+  list          List     @relation(fields: [listId], references: [id],onDelete: Cascade)
+  listId        String
+  status        TaskStatus @default(TODO)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  board         Board     @relation(fields: [boardId], references: [id],onDelete: Cascade) 
+  boardId       String  
+  comments      Comment[]
+  coverImageUrl String?
 }
 
 model User {
-  id          String   @id @default(uuid())
-  email       String   @unique
-  password    String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String   @id @default(uuid())
+  email        String   @unique
+  password     String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
   boardMembers BoardMember[]
 }
 
 model BoardMember {
-  id        String  @id @default(uuid())
-  boardId   String
-  userEmail String  
-  board     Board   @relation(fields: [boardId], references: [id])
-  createdAt DateTime @default(now())
-  user      User    @relation(fields: [userEmail], references: [email])
-  isStarred Boolean @default(false)
+  id         String  @id @default(uuid())
+  boardId    String
+  userEmail  String  
+  board      Board   @relation(fields: [boardId], references: [id],onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  user       User    @relation(fields: [userEmail], references: [email],onDelete: Cascade)
+  isStarred  Boolean @default(false)
 }
 
+model Comment{
+  id          String @id @default(uuid())
+  content     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  userEmail   String
+  taskId      String
+  task        Task   @relation(fields: [taskId], references: [id],onDelete: Cascade)
+}
 

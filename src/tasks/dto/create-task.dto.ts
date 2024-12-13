@@ -2,11 +2,12 @@ import { ApiProperty } from "@nestjs/swagger";
 import { TaskStatus } from "@prisma/client";
 import { IsDateString, IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID } from "class-validator";
 
-export class CreateTaskDto{
+export class CreateTaskDto {
+
     @IsString()
     @ApiProperty()
     @IsNotEmpty()
-    title: string;  
+    title: string;
 
     @IsOptional()
     @IsString()
@@ -21,11 +22,11 @@ export class CreateTaskDto{
     @IsOptional()
     @IsDateString()
     @ApiProperty()
-    dueDate?: string; 
+    dueDate?: string;
 
     @IsUUID()
     @ApiProperty()
-    listId: string; 
+    listId: string;
 
     @IsUUID()
     @ApiProperty()

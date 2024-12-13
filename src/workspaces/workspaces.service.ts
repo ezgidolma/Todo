@@ -1,10 +1,10 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { PrismaService } from "src/prisma/prisma.service";
 import { CreateWorkspaceDto } from "./dto/create-workspace.dto";
 import { UpdateWorkspaceDto } from "./dto/update-workspace.dto";
 
 @Injectable()
-export class WorkspaceService{
+export class WorkspaceService {
     constructor(private readonly prisma: PrismaService) { }
 
     async createWorkspace(data: CreateWorkspaceDto) {
@@ -32,7 +32,7 @@ export class WorkspaceService{
         const updateData: Partial<UpdateWorkspaceDto> = {
             title: data.title,
             updatedAt: new Date(),
-          };
+        };
 
         return await this.prisma.workspace.update({
             where: { id },
@@ -41,8 +41,8 @@ export class WorkspaceService{
     }
 
     async getWorkspaces() {
-            return await this.prisma.workspace.findMany();
-      
+        return await this.prisma.workspace.findMany();
+
     }
 
     async deleteWorkspace(id: string) {

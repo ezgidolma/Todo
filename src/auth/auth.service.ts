@@ -23,7 +23,6 @@ export class AuthService {
   async register(createUserDto: CreateUserDto) {
     const { email, password } = createUserDto;
 
-
     const { data, error } = await this.supabase.auth.signUp({
       email,
       password,
@@ -53,14 +52,7 @@ export class AuthService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
-
-    const payload = { email, sub: user.id };
-    const token = this.jwtService.sign(payload);
-
-    return {
-      user,
-      access_token: token,
-    };
+    return user;
   }
 
   async login(loginUserDto: LoginUserDto) {

@@ -1,7 +1,8 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { CreateCommentDto } from './dto/create-comment-task.dto';
 
 
 @Injectable()
@@ -14,31 +15,30 @@ export class TaskService {
             const listExists = await this.prisma.list.findUnique({
                 where: { id: data.listId },
             });
-    
+
             if (!listExists) {
                 throw new HttpException('List not found.', HttpStatus.NOT_FOUND);
             }
-    
+
             const boardExists = await this.prisma.board.findUnique({
                 where: { id: data.boardId },
             });
-    
+
             if (!boardExists) {
                 throw new HttpException('Board not found.', HttpStatus.NOT_FOUND);
             }
-    
-           
+
             const newTask = await this.prisma.task.create({
                 data: {
                     title: data.title,
                     description: data.description,
-                    status: data.status || 'TODO', 
+                    status: data.status || 'TODO',
                     dueDate: data.dueDate,
                     listId: data.listId,
                     boardId: data.boardId,
                 },
             });
-    
+
             return newTask;
         } catch (error) {
             throw error;
@@ -71,7 +71,7 @@ export class TaskService {
     }
 
     async getTasks() {
-            return await this.prisma.task.findMany();
+        return await this.prisma.task.findMany();
     }
 
     async deleteTask(id: string) {
@@ -87,4 +87,37 @@ export class TaskService {
             where: { id },
         });
     }
+
+    async addCommentToTask(userEmail: string, createCommentDto: CreateCommentDto) {
+        const { taskId, content } = createCommentDto;
+
+        const taskExists = await this.prisma.task.findUnique({
+            where: { id: taskId },
+        });
+        if (!taskExists) {
+            throw new Error('Task not found');
+        }
+
+        return await this.prisma.comment.create({
+            data: {
+                content,
+                userEmail,
+                taskId,
+            },
+        });
+    }
+
+    async getCommentsByTaskId(taskId: string) {
+        return await this.prisma.comment.findMany({
+            where: { taskId },
+            include: { task: true },
+        });
+    }
+
+    async updateCover(taskId: string, coverImageUrl: string) {
+        return await this.prisma.task.update({
+          where: { id: taskId },
+          data: { coverImageUrl },
+        });
+      }
 }

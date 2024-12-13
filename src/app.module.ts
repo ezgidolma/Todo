@@ -8,8 +8,8 @@ import { BoardModule } from './boards/boards.module';
 import { WorkspaceModule } from './workspaces/workspaces.module';
 
 @Module({
-  imports: [TaskModule,PrismaModule,AuthModule,ListModule,BoardModule,WorkspaceModule],
+  imports: [TaskModule, PrismaModule, AuthModule, ListModule, BoardModule, WorkspaceModule],
   controllers: [],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

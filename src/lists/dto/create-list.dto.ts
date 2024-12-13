@@ -1,11 +1,12 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsNotEmpty, IsString, IsUUID } from "class-validator";
 
-export class CreateListDto{
+export class CreateListDto {
+
     @IsString()
     @IsNotEmpty()
     @ApiProperty()
-    title: string;  
+    title: string;
 
     @IsUUID()
     @ApiProperty()
