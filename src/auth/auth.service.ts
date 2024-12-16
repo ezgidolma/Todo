@@ -1,10 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { SupabaseClient } from '@supabase/supabase-js';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { LoginUserDto } from './dto/login-user.dto';
+import { SupabaseClient } from '@supabase/supabase-js';
 import * as bcrypt from 'bcrypt';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { CreateUserDto } from './dto/create-user.dto';
+import { LoginUserDto } from './dto/login-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -13,11 +14,18 @@ export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
+    private configService: ConfigService,
   ) {
-    this.supabase = new SupabaseClient(
-      process.env.SUPABASE_URL,
-      process.env.SUPABASE_ANON_KEY,
-    );
+    const supabaseUrl = this.configService.get<string>('SUPABASE_URL');
+    const supabaseAnonKey = this.configService.get<string>('SUPABASE_ANON_KEY');
+
+    if (!supabaseUrl || !supabaseAnonKey) {
+      throw new Error(
+        'Supabase configuration missing in environment variables',
+      );
+    }
+
+    this.supabase = new SupabaseClient(supabaseUrl, supabaseAnonKey);
   }
 
   async register(createUserDto: CreateUserDto) {
@@ -36,7 +44,6 @@ export class AuthService {
     }
 
     const user = data?.user;
-
     const hashedPassword = await bcrypt.hash(password, 10);
 
     try {
@@ -52,6 +59,7 @@ export class AuthService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+
     return user;
   }
 
@@ -72,7 +80,7 @@ export class AuthService {
       throw new HttpException('Password incorrect.', HttpStatus.UNAUTHORIZED);
     }
 
-    const payload = {  id: user.id, email: user.email };
+    const payload = { id: user.id, email: user.email };
     const token = this.jwtService.sign(payload);
 
     return {
