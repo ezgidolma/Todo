@@ -36,6 +36,14 @@ export class BoardController {
     return await this.boardService.getBoards();
   }
 
+  @Get(':workspaceId/boards')
+  @ApiOperation({ summary: 'Get all boards by workspaceId' })
+  @ApiParam({ name: 'workspaceId', description: 'The ID of the workspace' })
+  @ApiResponse({ status: 200, description: 'List of boards.' })
+ async getBoards(@Param('workspaceId') workspaceId: string) {
+  return await this.boardService.getBoardsByWorkspaceId(workspaceId);
+ }
+
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a board' })
   @ApiParam({ name: 'id', description: 'The ID of the board to be deleted' })

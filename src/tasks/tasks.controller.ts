@@ -1,11 +1,12 @@
-import { Body, Controller, Delete, Get, Headers, Param, Patch, Post, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { TaskService } from "./tasks.service";
 import { CreateTaskDto } from "./dto/create-task.dto";
 import { UpdateTaskDto } from "./dto/update-task.dto";
-import { ApiOperation, ApiResponse, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiParam, ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { JwtAuthGuard } from "src/jwt/jwt-authguard";
 import { CreateCommentDto } from "./dto/create-comment-task.dto";
-import { UpdateCoverDto } from "./dto/update-cover-task.dto";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { Express } from 'express';
 
 @Controller('tasks')
 @UseGuards(JwtAuthGuard)
@@ -63,8 +64,26 @@ export class TaskController {
     return await this.taskService.getCommentsByTaskId(taskId);
   }
 
-  @Patch(':taskId/cover')
-  async setCover(@Param('taskId') taskId: string, @Body() updateCoverDto: UpdateCoverDto) {
-    return await this.taskService.updateCover(taskId, updateCoverDto.coverImageUrl);
+  @Post('upload-image')
+  @UseInterceptors(FileInterceptor('file'))  // 'file' form-data parametresi
+  @ApiConsumes('multipart/form-data')  // Dosya gönderimi için uygun tipi belirtir
+  @ApiOperation({ summary: 'Upload an image to Supabase storage' })
+  @ApiResponse({ status: 201, description: 'Image uploaded successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid file or upload error' })
+  @ApiBody({
+    description: 'Upload image file',
+    type: 'object',
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  async uploadImage(@UploadedFile() file: Express.Multer.File) {
+      return await this.taskService.uploadImage(file);
   }
 }

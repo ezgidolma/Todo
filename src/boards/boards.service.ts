@@ -66,6 +66,17 @@ export class BoardService {
     });
   }
 
+  async getBoardsByWorkspaceId(workspaceId: string) {
+    return await this.prisma.board.findMany({
+      where: {
+        workspaceId: workspaceId,  
+      },
+      include: {
+        tasks: true,
+          },
+    });
+  }
+
   async deleteBoard(id: string) {
     const existingBoard = await this.prisma.board.findUnique({
       where: { id },

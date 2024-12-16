@@ -3,11 +3,18 @@ import { CreateTaskDto } from './dto/create-task.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { CreateCommentDto } from './dto/create-comment-task.dto';
-
+import { SupabaseClient } from '@supabase/supabase-js';
 
 @Injectable()
 export class TaskService {
-    constructor(private readonly prisma: PrismaService) { }
+    private readonly supabase:SupabaseClient; 
+
+    constructor(private readonly prisma: PrismaService) {
+      this.supabase = new SupabaseClient(
+        process.env.SUPABASE_URL,
+        process.env.SUPABASE_ANON_KEY
+      );
+  }
 
     async createTask(data: CreateTaskDto) {
         try {
@@ -114,10 +121,27 @@ export class TaskService {
         });
     }
 
-    async updateCover(taskId: string, coverImageUrl: string) {
-        return await this.prisma.task.update({
-          where: { id: taskId },
-          data: { coverImageUrl },
-        });
-      }
+    async uploadImage(file: Express.Multer.File) {
+    if (!file) {
+      throw new Error('No file uploaded');
+    }
+
+    const fileName = `${Date.now()}_${file.originalname}`;
+   
+    const { data, error } = await this.supabase
+      .storage
+      .from('images')  
+      .upload(fileName, file.buffer, {
+        cacheControl: '3600', 
+        upsert: false, 
+      });
+
+    if (error) {
+      throw new Error(`Error uploading image: ${error.message}`);
+    }
+    return {
+      fileName: data?.path,
+      url: `${process.env.SUPABASE_URL}/storage/v1/object/public/images/${fileName}`,  
+    };
+  }
 }

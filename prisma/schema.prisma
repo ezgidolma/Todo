@@ -26,6 +26,8 @@ model Workspace{
   boards      Board[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  createdBy   String   
+  user        User      @relation(fields: [createdBy], references: [id])
 }
 
 model Board {
@@ -73,6 +75,7 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   boardMembers BoardMember[]
+  workspaces   Workspace[]
 }
 
 model BoardMember {

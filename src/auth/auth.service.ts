@@ -72,7 +72,7 @@ export class AuthService {
       throw new HttpException('Password incorrect.', HttpStatus.UNAUTHORIZED);
     }
 
-    const payload = { email: user.email };
+    const payload = {  id: user.id, email: user.email };
     const token = this.jwtService.sign(payload);
 
     return {

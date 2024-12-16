@@ -7,11 +7,12 @@ import { UpdateWorkspaceDto } from "./dto/update-workspace.dto";
 export class WorkspaceService {
     constructor(private readonly prisma: PrismaService) { }
 
-    async createWorkspace(data: CreateWorkspaceDto) {
+    async createWorkspace(data: CreateWorkspaceDto, userId: string) {
         try {
             const newWorkspace = await this.prisma.workspace.create({
                 data: {
                     title: data.title,
+                    createdBy:userId
                 },
             });
             return newWorkspace;
@@ -40,11 +41,13 @@ export class WorkspaceService {
         });
     }
 
-    async getWorkspaces() {
-        return await this.prisma.workspace.findMany();
-
-    }
-
+    async getWorkspacesByUserId(userId: string) {
+        return await this.prisma.workspace.findMany({
+          where: { createdBy: userId }, // createdBy alanı userId ile eşleşen workspace'leri bul
+          include: { boards: true },    // İlişkili board'ları dahil et
+        });
+      }
+      
     async deleteWorkspace(id: string) {
         const existingWorkspace = await this.prisma.workspace.findUnique({
             where: { id },

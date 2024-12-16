@@ -16,8 +16,9 @@ export class WorkspaceController {
   @Post()
   @ApiOperation({ summary: 'Create a new workspace' })
   @ApiResponse({ status: 201, description: 'The workspace has been successfully created.' })
-  async create(@Body() createWorkspaceDto: CreateWorkspaceDto) {
-    return await this.workspaceService.createWorkspace(createWorkspaceDto);
+  async create(@Body() createWorkspaceDto: CreateWorkspaceDto, @Req() req) {
+    const userId = req.user.id;
+    return await this.workspaceService.createWorkspace(createWorkspaceDto,userId);
   }
 
 
@@ -32,9 +33,10 @@ export class WorkspaceController {
 
   @Get()
   @ApiOperation({ summary: 'Get all workspaces' })
-  @ApiResponse({ status: 200, description: 'List of workspaces' })
-  async findAll() {
-    return await this.workspaceService.getWorkspaces();
+  @ApiOperation({ summary: 'Get all workspaces by workspaceId' })
+  async getUserWorkspaces(@Req() req) {
+    const userId = req.user.id; // JwtStrategy'den gelen id
+    return await this.workspaceService.getWorkspacesByUserId(userId);
   }
 
   @Delete(':id')
