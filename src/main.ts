@@ -1,11 +1,17 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
-import * as multer from 'multer';
+import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as dotenv from 'dotenv';
+import * as express from 'express';
+import { AppModule } from './app.module';
+
+dotenv.config({ path: process.cwd() + '/.env' });
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
 
   const config = new DocumentBuilder()
     .setTitle('API Documentation')
@@ -19,9 +25,6 @@ async function bootstrap() {
 
   app.enableCors();
   app.useGlobalPipes(new ValidationPipe());
-  app.use(
-    multer({ dest: './uploads' }).single('file'),  // Yükleme hedefi belirleme
-  );
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
