@@ -16,8 +16,9 @@ export class BoardController {
   @Post()
   @ApiOperation({ summary: 'Create a new board' })
   @ApiResponse({ status: 201, description: 'The board has been successfully created.' })
-  async create(@Body() createBoardDto: CreateBoardDto) {
-    return await this.boardService.createBoard(createBoardDto);
+  async create(@Body() createBoardDto: CreateBoardDto, @Req() req: any) {
+    const userEmail = req.user.email;
+    return await this.boardService.createBoard(createBoardDto, userEmail);
   }
 
   @Patch(':id')
@@ -25,8 +26,9 @@ export class BoardController {
   @ApiParam({ name: 'id', description: 'The ID of the board to be updated' })
   @ApiResponse({ status: 200, description: 'The board has been successfully updated.' })
   @ApiResponse({ status: 404, description: 'Board not found' })
-  async update(@Param('id') id: string, @Body() updateBoardDto: UpdateBoardDto) {
-    return await this.boardService.updateBoard(id, updateBoardDto);
+  async update(@Param('id') id: string, @Body() updateBoardDto: UpdateBoardDto, @Req() req: any) {
+    const userEmail = req.user.email;
+    return await this.boardService.updateBoard(id, updateBoardDto, userEmail);
   }
 
   @Get()
@@ -49,8 +51,9 @@ export class BoardController {
   @ApiParam({ name: 'id', description: 'The ID of the board to be deleted' })
   @ApiResponse({ status: 200, description: 'The Board has been successfully deleted.' })
   @ApiResponse({ status: 404, description: 'board not found' })
-  async remove(@Param('id') id: string) {
-    return await this.boardService.deleteBoard(id);
+  async remove(@Param('id') id: string, @Req() req: any) {
+    const userEmail = req.user.email;
+    return await this.boardService.deleteBoard(id, userEmail);
   }
 
   @Post('add-member')
@@ -58,8 +61,9 @@ export class BoardController {
   @ApiResponse({ status: 201, description: 'User successfully added to the board.' })
   @ApiResponse({ status: 400, description: 'Bad request.' })
   @ApiResponse({ status: 404, description: 'User not found.' })
-  async addMember(@Body() addMemberToBoardDto: AddMemberToBoardDto) {
-    return await this.boardService.addMemberToBoard(addMemberToBoardDto);
+  async addMember(@Body() addMemberToBoardDto: AddMemberToBoardDto, @Req() req: any) {
+    const userEmail = req.user.email;
+    return await this.boardService.addMemberToBoard(addMemberToBoardDto, userEmail);
   }
 
   @Get(':boardId/members')
@@ -73,9 +77,11 @@ export class BoardController {
   @ApiOperation({ summary: 'Remove a user from a board' })
   @ApiResponse({ status: 200, description: 'User successfully removed from the board.' })
   @ApiResponse({ status: 404, description: 'Member or board not found.' })
-  async removeMember(@Body() removeMemberToBoardDto: RemoveMemberToBoardDto) {
-    return await this.boardService.removeMemberFromBoard(removeMemberToBoardDto);
+  async removeMember(@Body() removeMemberToBoardDto: RemoveMemberToBoardDto, @Req() req: any) {
+    const userEmail = req.user.email;
+    return await this.boardService.removeMemberFromBoard(removeMemberToBoardDto, userEmail);
   }
+
 
   @Patch(':boardId/star')
   @ApiOperation({ summary: 'Star a board' })
