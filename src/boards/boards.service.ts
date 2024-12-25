@@ -96,6 +96,23 @@ export class BoardService {
     });
   }
 
+  async getBoardsDetails(boardId: string) {
+    return await this.prisma.board.findUnique({
+      where: {
+        id: boardId,
+      },
+      include: {
+        lists: {
+          include: {
+            tasks: true,
+          },
+        },
+        tasks: true,
+      },
+    });
+  }
+
+  
   async getBoardsByWorkspaceId(workspaceId: string) {
     return await this.prisma.board.findMany({
       where: {

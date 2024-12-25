@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Req, UseGuards } from "@nestjs/common";
 import { BoardService } from "./boards.service";
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse } from "@nestjs/swagger";
 import { CreateBoardDto } from "./dto/create-board.dto";
@@ -102,4 +102,14 @@ export class BoardController {
     const userEmail = req.user.email;
     return await this.boardService.unstarBoard(boardId, userEmail);
   }
+
+  @Get(':boardId')
+  async getBoard(@Param('boardId') boardId: string) {
+    const board = await this.boardService.getBoardsDetails(boardId);
+    if (!board) {
+      throw new NotFoundException('Board not found');
+    }
+    return board;
+  }
+
 }
